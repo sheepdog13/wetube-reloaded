@@ -1,7 +1,9 @@
 extends base.pug
 
 block content 
-    h3 #{video.views} #{video.views === 1 ? "view" : "views"}
+    div 
+        p=video.description
+        small=video.createdAt
     //- /을 넣고 안넣고의 차이 /을 넣으면 localhost:4000옆에 생기고 /을 안넣으면 마지막이 바뀐다
     //- absolute와 relative url의 차이점
     a(href=`${video.id}/edit`) Edit Video &rarr;
