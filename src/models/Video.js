@@ -20,6 +20,7 @@ videoSchema.pre("save", async function(){
 });
 */
 
+// static function만드는 방법
 videoSchema.static('formatHashtags', function(hashtags){
     return hashtags.split(",").map((word) => (word.startsWith('#') ? word : `#${word}`));
 });
