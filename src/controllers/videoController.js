@@ -47,9 +47,7 @@ export const postEdit = async (req, res) => {
     await Video.findByIdAndUpdate(id, {
         title,
         description,
-        hashtags: hashtags
-            .split(",")
-            .map((word)=> (word.startsWith('#') ? word : `#${word}`)),
+        hashtags: Video.formatHashtags(hashtags),
     })
     return res.redirect(`/videos/${id}`);
 }
@@ -64,7 +62,7 @@ export const postUpload = async (req, res) => {
         await Video.create({
             title,
             description,
-            hashtags: hashtags.split(",").map((word) => `#${word}`)
+            hashtags: Video.formatHashtags(hashtags),
         });
         return res.redirect("/");
     } catch(error){
@@ -79,11 +77,20 @@ export const deleteVideo = async (req, res) => {
     const { id } = req.params;
     await Video.findByIdAndDelete(id);
     return res.redirect("/");
-    
 }
 
-export const search = (req, res) => {
+export const search = async (req, res) => {
     const { keyword } = req.query;
-    return res.render("search", { pageTitle: "Search"})
+    // 검색을 안했을때 undefined를 막기위한 설정
+    let videos = [];
+    if(keyword) {
+        const videos = await Video.find({
+            title : {
+                // 정규식을 mongodb에서 쓰는 방법 i는 소문자 대문자 구별을 없애준다
+                $regex: new RegExp(`${keyword}`, "i")
+            },
+        });
+    }
+    return res.render("search", { pageTitle: "Search", videos})
 }
 
