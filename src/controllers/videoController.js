@@ -22,7 +22,7 @@ export const watch = async (req, res) => {
     // error를 먼저처리하는게 편하다
     if(!video){
         // return을 설정해 다음 작동이 실행되지 않게 해야한다
-        return res.render("404", {pageTitle: "Video not found"});
+        return res.status(404).render("404", {pageTitle: "Video not found"});
     }
     return res.render("watch", {pageTitle: video.title, video});
 };
@@ -31,7 +31,7 @@ export const getEdit = async (req, res) => {
     const { id } = req.params;
     const video = await Video.findById(id);
     if(!video){
-        return res.render("404", {pageTitle: "Video not found"});
+        return res.status(404).render("404", {pageTitle: "Video not found"});
     }
     res.render("edit", {pageTitle: `Edit ${video.title}`, video})
 };
@@ -66,7 +66,7 @@ export const postUpload = async (req, res) => {
         });
         return res.redirect("/");
     } catch(error){
-        return res.render("upload", {
+        return res.status(400).render("upload", {
             pageTitle: "Upload Video",
             errorMessage: error._message,
         });
