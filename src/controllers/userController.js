@@ -18,13 +18,6 @@ export const postjoin = async (req, res) => {
             errorMessage: "This username/email is already taken."
         });
     }
-    const emailExists = await User.exists({email});
-    if(emailExists) {
-        return res.render("join", {
-            pageTitle,
-            errorMessage: "This email is already taken."
-        });
-    }
     try{
         await User.create({
             name, 
@@ -59,6 +52,8 @@ export const postLogin = async (req, res) => {
             errorMessage: "Wrong password",
         })
     }
+    req.session.loggedIn = true;
+    req.session.user = user;
     return res.redirect("/");
 };
 export const edit = (req, res) => res.send("Edit User");
