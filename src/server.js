@@ -16,10 +16,11 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({extended:true}));
 
 app.use(session({
-    secret:"Hello!",
-    resave:true,
-    saveUninitialized: true,
-    store: MongoStore.create({mongoUrl:"mongodb://127.0.0.1:27017/wetube"})
+    secret: process.env.COOKI_SECRET,
+    resave:false,
+    // 세션을 수정할 때만 세션을 DB에 저장하고 쿠키를 넘겨준다
+    saveUninitialized: false,
+    store: MongoStore.create({mongoUrl: process.env.DB_URL})
 }))
 
 app.use(localsMiddleware)
