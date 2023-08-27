@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import bcrypt, { compareSync } from "bcrypt"
 import { json } from "express";
 import { restart } from "nodemon";
+import session from "express-session";
 
 export const getjoin = (req, res) => res.render("join", {pageTitle: "join"});
 export const postjoin = async (req, res) => {
@@ -37,6 +38,31 @@ export const postjoin = async (req, res) => {
     } 
     return res.redirect("/login");
 };
+export const postEdit = async (req, res) => {
+    const {
+        session:{
+            user: {_id},
+        },
+        body: {name, email, username, location},
+    } = req;
+    const sessionUsername = req.session.user.username;
+    if(sessionUsername !== username){
+        console.log("너 바꿀려고 하는구나");
+    }else {
+        console.log("아니 나 안바꿔")
+    }
+    const updateUser = await User.findByIdAndUpdate(_id,
+         {
+            name,
+            email,
+            username,
+            location,
+        },
+        { new: true }
+    );
+    req.session.user = updateUser;
+    return res.redirect("/users/edit");
+}
 export const getLogin = (req, res) => res.render("login",{pageTitle:"Login"});
 export const postLogin = async (req, res) => {
     const pageTitle = "Login"
@@ -128,9 +154,7 @@ export const finishGithubLogin = async (req,res) => {
 export const getEdit = (req, res) => {
     return res.render("edit-profile", {pageTitle: "Edit Profile"});
 }
-export const postEdit = (req, res) => {
-    return res.render("edit-profile");
-}
+
 export const remove = (req, res) => res.send("Remove User");
 export const logout = (req, res) => {
     req.session.destroy();
