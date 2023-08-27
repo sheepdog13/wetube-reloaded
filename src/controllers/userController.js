@@ -38,31 +38,7 @@ export const postjoin = async (req, res) => {
     } 
     return res.redirect("/login");
 };
-export const postEdit = async (req, res) => {
-    const {
-        session:{
-            user: {_id},
-        },
-        body: {name, email, username, location},
-    } = req;
-    const sessionUsername = req.session.user.username;
-    if(sessionUsername !== username){
-        console.log("너 바꿀려고 하는구나");
-    }else {
-        console.log("아니 나 안바꿔")
-    }
-    const updateUser = await User.findByIdAndUpdate(_id,
-         {
-            name,
-            email,
-            username,
-            location,
-        },
-        { new: true }
-    );
-    req.session.user = updateUser;
-    return res.redirect("/users/edit");
-}
+
 export const getLogin = (req, res) => res.render("login",{pageTitle:"Login"});
 export const postLogin = async (req, res) => {
     const pageTitle = "Login"
@@ -154,7 +130,46 @@ export const finishGithubLogin = async (req,res) => {
 export const getEdit = (req, res) => {
     return res.render("edit-profile", {pageTitle: "Edit Profile"});
 }
-
+export const postEdit = async (req, res) => {
+    const {
+        session:{
+            user: {_id},
+        },
+        body: {name, email, username, location},
+    } = req;
+    const sessionUsername = req.session.user.username;
+    const sessionEmail = req.session.user.email;
+    if(sessionUsername !== username){
+        // 이때 기존의 username이랑 겹치는게 있는지 확인해줘야 한다
+        const exists = await User.exists({username});
+        if(exists){
+            return res.status(400).render("edit-profile", {
+                pageTitle:"Edit Profile",
+                errorMessage: "This username is already taken."
+            });
+        }
+    }
+    if(sessionEmail !== email){
+        const exists = await User.exists({email});
+        if(exists){
+            return res.status(400).render("edit-profile", {
+                pageTitle:"Edit Profile",
+                errorMessage: "This email is already taken."
+            });
+        }
+    }
+    const updateUser = await User.findByIdAndUpdate(_id,
+         {
+            name,
+            email,
+            username,
+            location,
+        },
+        { new: true }
+    );
+    req.session.user = updateUser;
+    return res.redirect("/users/edit");
+}
 export const remove = (req, res) => res.send("Remove User");
 export const logout = (req, res) => {
     req.session.destroy();
